@@ -1,0 +1,32 @@
+package com.growcoffee.service;
+
+import com.growcoffee.model.Usuario;
+import com.growcoffee.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+public class UsuarioService {
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public Usuario registrar(Usuario usuario) {
+        // Encriptamos la contraseña antes de guardar
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        return usuarioRepository.save(usuario);
+    }
+
+    public Optional<Usuario> login(String email, String password) {
+        Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+        if (usuario.isPresent() && passwordEncoder.matches(password, usuario.get().getPassword())) {
+            return usuario;
+        }
+        return Optional.empty();
+    }
+}

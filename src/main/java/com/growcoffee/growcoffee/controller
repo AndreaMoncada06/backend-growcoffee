@@ -1,0 +1,30 @@
+package com.growcoffee.controller;
+
+import com.growcoffee.model.Usuario;
+import com.growcoffee.service.UsuarioService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/usuarios")
+public class UsuarioController {
+
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @PostMapping("/registro")
+    public Usuario registrar(@RequestBody Usuario usuario) {
+        return usuarioService.registrar(usuario);
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody Usuario usuario) {
+        Optional<Usuario> user = usuarioService.login(usuario.getEmail(), usuario.getPassword());
+        if (user.isPresent()) {
+            return "✅ Login exitoso. Bienvenido " + user.get().getNombre();
+        }
+        return "❌ Credenciales incorrectas";
+    }
+}
